@@ -1,49 +1,39 @@
 package generate
 
 import (
-	"fmt"
-	"path"
-	"time"
+	"image"
+
+	"github.com/fogleman/gg"
+	"github.com/pkg/errors"
 )
 
-// LatestComic is a magic number that grabs whatever is the latest comic
-const LatestComic = 0
+const (
+	// InputImage holds the path to the background image
+	InputImage = "./background.jpg"
+	// Output Path for the generated image
+	OutputImage = "./social-banner.png"
+)
 
-// BuildURL from comicNumber (or LatestComic).
-func BuildURL(comicNumber int) string {
-	if comicNumber == LatestComic {
-		return "https://xkcd.com/info.0.json"
-	}
-	return fmt.Sprintf("https://xkcd.com/%d/info.0.json", comicNumber)
-}
-
-// APIResponse returned by the XKCD API
-type APIResponse struct {
-	Month       string `json:"month"`
-	Number      int    `json:"num"`
-	Link        string `json:"link"`
-	Year        string `json:"year"`
-	News        string `json:"news"`
-	SafeTitle   string `json:"safe_title"`
-	Transcript  string `json:"transcript"`
-	Description string `json:"alt"`
-	Image       string `json:"img"`
-	Title       string `json:"title"`
-	Day         string `json:"day"`
-}
-
-// Date returns a *time.Time based on the API strings (or nil if the response is malformed).
-func (ar APIResponse) Date() *time.Time {
-	t, err := time.Parse(
-		"2006-1-2",
-		fmt.Sprintf("%s-%s-%s", ar.Year, ar.Month, ar.Day),
-	)
+// Load image file from disk
+func (app *AppEnv) LoadImage(inputImage string) (image.Image, error) {
+	img, err := gg.LoadImage(inputImage)
 	if err != nil {
-		return nil
+		return image.Rect(0, 0, 0, 0), errors.Wrap(err, "load background image")
 	}
-	return &t
+	return img, nil
 }
 
-func (ar APIResponse) Filename() string {
-	return path.Base(ar.Image)
+// Render image
+func (app *AppEnv) RenderImage(img image.Image) {
+	app.dc = gg.NewContext(1000, 420)
+	app.dc.DrawImage(img, 0, 0)
+}
+
+// Save the image
+func (app *AppEnv) SaveImage(outputFileName string) error {
+	err := app.dc.SavePNG(outputFileName)
+	if err != nil {
+		return errors.Wrap(err, "save png")
+	}
+	return nil
 }
