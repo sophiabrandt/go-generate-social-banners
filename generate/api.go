@@ -2,6 +2,7 @@ package generate
 
 import (
 	"image"
+	"image/color"
 
 	"github.com/fogleman/gg"
 	"github.com/pkg/errors"
@@ -23,10 +24,20 @@ func (app *AppEnv) LoadImage(inputImage string) (image.Image, error) {
 	return img, nil
 }
 
-// Render image
+// Render image with semi-transparent overlay
 func (app *AppEnv) RenderImage(img image.Image) {
 	app.dc = gg.NewContext(1000, 420)
 	app.dc.DrawImage(img, 0, 0)
+	// add overlay
+	margin := 20.0
+	x := margin
+	y := margin
+	w := float64(app.dc.Width()) - (2.0 * margin)
+	h := float64(app.dc.Height()) - (2.0 * margin)
+	// black background with 80 % opacity (80 % x 255 = 204)
+	app.dc.SetColor(color.RGBA{0, 0, 0, 204})
+	app.dc.DrawRectangle(x, y, w, h)
+	app.dc.Fill()
 }
 
 // Save the image
