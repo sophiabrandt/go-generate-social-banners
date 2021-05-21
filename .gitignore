@@ -79,5 +79,5 @@ Temporary Items
 # End of https://www.gitignore.io/api/go,linux,macos,visualstudiocode
 
 # Ignore image files for source control
-.png
-.jpg
+*.png
+*.jpg
