@@ -13,9 +13,11 @@ const (
 	// InputImage holds the path to the background image
 	InputImage = "./background.jpg"
 	// Output Path for the generated image
-	OutputImage = "./social-banner.png"
+	OutputImage = "./social-media-banner.png"
 	// default text (domain name)
 	DefaultText = "https://rockyourcode.com"
+	// Title
+	Title = "Programmatically generate social media images in Go"
 )
 
 // Load image file from disk
@@ -48,9 +50,9 @@ func (app *AppEnv) RenderImage(img image.Image) {
 // Add default text (domain name)
 func (app *AppEnv) AddDefaultText(text string) error {
 	textColor := color.White
-	fontPath := filepath.Join("fonts", "Roboto-Regular.ttf")
-	if err := app.dc.LoadFontFace(fontPath, 45); err != nil {
-		return errors.Wrap(err, "load font")
+	fontPath := filepath.Join("fonts", "SpaceMono-Regular.ttf")
+	if err := app.dc.LoadFontFace(fontPath, 30); err != nil {
+		return errors.Wrap(err, "load font for default text")
 	}
 	r, g, b, _ := textColor.RGBA()
 	mutedColor := color.RGBA{
@@ -60,11 +62,32 @@ func (app *AppEnv) AddDefaultText(text string) error {
 		A: uint8(200),
 	}
 	app.dc.SetColor(mutedColor)
-	marginY := float64(30)
-	_, textHeight := app.dc.MeasureString(text)
-	x := float64(70)
+	marginX := 50.0
+	marginY := 20.0
+	textWidth, textHeight := app.dc.MeasureString(text)
+	x := float64(app.dc.Width()) - textWidth - marginX
 	y := float64(app.dc.Height()) - textHeight - marginY
 	app.dc.DrawString(text, x, y)
+	return nil
+}
+
+// Add title
+func (app *AppEnv) AddTitle(title string) error {
+	textColor := color.White
+	textShadowColor := color.Black
+	fontPath := filepath.Join("fonts", "BioRhyme-Bold.ttf")
+	if err := app.dc.LoadFontFace(fontPath, 65); err != nil {
+		return errors.Wrap(err, "load font for title")
+	}
+	textRightMargin := 60.0
+	textTopMargin := 70.0
+	x := textRightMargin
+	y := textTopMargin
+	maxWidth := float64(app.dc.Width()) - textRightMargin - textRightMargin
+	app.dc.SetColor(textShadowColor)
+	app.dc.DrawStringWrapped(title, x+1, y+1, 0, 0, maxWidth, 1.5, gg.AlignLeft)
+	app.dc.SetColor(textColor)
+	app.dc.DrawStringWrapped(title, x, y, 0, 0, maxWidth, 1.5, gg.AlignLeft)
 	return nil
 }
 

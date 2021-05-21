@@ -13,6 +13,7 @@ type AppEnv struct {
 	inputImg    string      // background image
 	outputImg   string      // file name for the generated image
 	defaultText string      // default text (domain name)
+	title       string      // title
 	dc          *gg.Context // drawContext for images
 }
 
@@ -41,6 +42,9 @@ func (app *AppEnv) fromArgs(args []string) error {
 	fl.StringVar(
 		&app.defaultText, "d", DefaultText, "Default Text (domain name)",
 	)
+	fl.StringVar(
+		&app.title, "t", Title, "Title",
+	)
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
@@ -54,7 +58,7 @@ func (app *AppEnv) run() error {
 		return err
 	}
 
-	// render image
+	// render image with semi-transparent overlay
 	app.RenderImage(imgLoaded)
 
 	// add default text
@@ -62,8 +66,13 @@ func (app *AppEnv) run() error {
 		return err
 	}
 
+	// add title
+	if err := app.AddTitle(app.title); err != nil {
+		return err
+	}
+
 	// save image
-	if err := app.SaveImage("./social-media.png"); err != nil {
+	if err := app.SaveImage(app.outputImg); err != nil {
 		return err
 	}
 	return nil
