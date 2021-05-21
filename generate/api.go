@@ -50,7 +50,7 @@ func (app *AppEnv) RenderImage(img image.Image) {
 // Add default text (domain name)
 func (app *AppEnv) AddDefaultText(text string) error {
 	textColor := color.White
-	fontPath := filepath.Join("fonts", "SpaceMono-Regular.ttf")
+	fontPath := filepath.Join("fonts", "FiraCode-Regular.ttf")
 	if err := app.dc.LoadFontFace(fontPath, 30); err != nil {
 		return errors.Wrap(err, "load font for default text")
 	}
