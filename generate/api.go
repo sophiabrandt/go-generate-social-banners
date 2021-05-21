@@ -15,7 +15,7 @@ const (
 	// Output Path for the generated image
 	OutputImage = "./social-media-banner.png"
 	// default text (domain name)
-	DefaultText = "https://rockyourcode.com"
+	DefaultText = "https://www.rockyourcode.com"
 	// Title
 	Title = "Programmatically generate social media images in Go"
 )

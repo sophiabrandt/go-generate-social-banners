@@ -30,7 +30,7 @@ The project applies the idea from these two blog posts:
 >
 Usage of go-generate-social-banners:
 -d string
-      Default Text (domain name) (default "https://rockyourcode.com")
+      Default Text (domain name) (default "https://www.rockyourcode.com")
 -i string
       Path to background image to generate banner from (default "./background.jpg")
 -o string
