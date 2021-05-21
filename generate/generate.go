@@ -10,9 +10,10 @@ import (
 
 // AppEnv holds the local context for the application.
 type AppEnv struct {
-	inputImg  string      // background image
-	outputImg string      // file name for the generated image
-	dc        *gg.Context // drawContext for images
+	inputImg    string      // background image
+	outputImg   string      // file name for the generated image
+	defaultText string      // default text (domain name)
+	dc          *gg.Context // drawContext for images
 }
 
 // CLI runs the generate command line app and returns its exit status.
@@ -37,6 +38,9 @@ func (app *AppEnv) fromArgs(args []string) error {
 	fl.StringVar(
 		&app.outputImg, "o", OutputImage, "Full path of the image to generate",
 	)
+	fl.StringVar(
+		&app.defaultText, "d", DefaultText, "Default Text (domain name)",
+	)
 	if err := fl.Parse(args); err != nil {
 		return err
 	}
@@ -52,6 +56,11 @@ func (app *AppEnv) run() error {
 
 	// render image
 	app.RenderImage(imgLoaded)
+
+	// add default text
+	if err := app.AddDefaultText(app.defaultText); err != nil {
+		return err
+	}
 
 	// save image
 	if err := app.SaveImage("./social-media.png"); err != nil {
