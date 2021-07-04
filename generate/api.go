@@ -3,10 +3,13 @@ package generate
 import (
 	"image"
 	"image/color"
-	"path/filepath"
+
+	"github.com/golang/freetype/truetype"
 
 	"github.com/fogleman/gg"
 	"github.com/pkg/errors"
+	"github.com/sophiabrandt/go-generate-social-banners/fonts"
+	"golang.org/x/image/font"
 )
 
 const (
@@ -19,6 +22,29 @@ const (
 	// Title
 	Title = "Programmatically generate social media images in Go"
 )
+
+// loadFontFace is a helper function to load the specified font file
+// with the specified point size from a string of bytes.
+func loadFontFace(fontBytes []byte, points float64) (font.Face, error) {
+	f, err := truetype.Parse(fontBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "parse font for default text")
+	}
+	face := truetype.NewFace(f, &truetype.Options{
+		Size: points,
+		// Hinting: font.HintingFull,
+	})
+	return face, nil
+}
+
+// LoadFontFace loads the specified font into the draw context.
+func (app *AppEnv) LoadFontFace(fontBytes []byte, points float64) error {
+	face, err := loadFontFace(fontBytes, points)
+	if err == nil {
+		app.dc.SetFontFace(face)
+	}
+	return errors.Wrap(err, "load font for default text")
+}
 
 // Load image file from disk
 func (app *AppEnv) LoadImage(inputImage string) (image.Image, error) {
@@ -50,8 +76,7 @@ func (app *AppEnv) RenderImage(img image.Image) {
 // Add default text (domain name)
 func (app *AppEnv) AddDefaultText(text string) error {
 	textColor := color.White
-	fontPath := filepath.Join("fonts", "FiraCode-Regular.ttf")
-	if err := app.dc.LoadFontFace(fontPath, 30); err != nil {
+	if err := app.LoadFontFace(fonts.DefaultFont, 30); err != nil {
 		return errors.Wrap(err, "load font for default text")
 	}
 	r, g, b, _ := textColor.RGBA()
@@ -75,12 +100,11 @@ func (app *AppEnv) AddDefaultText(text string) error {
 func (app *AppEnv) AddTitle(title string) error {
 	textColor := color.White
 	textShadowColor := color.Black
-	fontPath := filepath.Join("fonts", "BioRhyme-Bold.ttf")
-	if err := app.dc.LoadFontFace(fontPath, 65); err != nil {
+	if err := app.LoadFontFace(fonts.TitleFont, 65); err != nil {
 		return errors.Wrap(err, "load font for title")
 	}
 	textRightMargin := 60.0
-	textTopMargin := 70.0
+	textTopMargin := 40.0
 	x := textRightMargin
 	y := textTopMargin
 	maxWidth := float64(app.dc.Width()) - textRightMargin - textRightMargin
